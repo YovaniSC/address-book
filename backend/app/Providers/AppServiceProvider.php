@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\ContactRepositoryInterface;
+use App\Repositories\EloquentContactRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ContactRepositoryInterface::class, EloquentContactRepository::class);
     }
 
     /**
