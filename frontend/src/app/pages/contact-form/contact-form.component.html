@@ -1,80 +1,87 @@
+<!-- Overlay loading: guardando / enviando correo -->
+<div *ngIf="loading" class="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-xl bg-indigo-600/10 grid place-items-center">
+        <div class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-bold text-gray-900">Procesando...</p>
+        <p class="text-sm text-gray-600">{{ statusText }}</p>
+      </div>
+    </div>
+
+    <div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+      <div class="h-full w-2/3 animate-pulse rounded-full bg-indigo-600"></div>
+    </div>
+
+    <p class="mt-3 text-xs text-gray-500">
+      Espera a que termine para confirmar el envío.
+    </p>
+  </div>
+</div>
+
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
   <div class="max-w-4xl mx-auto p-4 sm:p-8">
-    <!-- Top actions -->
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <button
+        type="button"
         (click)="back()"
         class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
       >
         ← Volver
       </button>
 
-      <div class="text-xs font-semibold text-gray-600" *ngIf="loading">
-        Guardando...
-      </div>
-    </div>
-
-    <!-- Header -->
-    <div class="mt-6">
       <div class="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
         Contacto • {{ isEdit ? 'Editar' : 'Nuevo' }}
       </div>
+    </div>
 
-      <h1 class="mt-3 text-3xl font-bold tracking-tight text-gray-900">
+    <div class="mt-6">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900">
         {{ isEdit ? 'Editar contacto' : 'Nuevo contacto' }}
       </h1>
-
       <p class="mt-1 text-sm text-gray-600">
-        Minimalista y claro. <span class="font-semibold">Al menos 1 correo es obligatorio.</span>
+        Los campos con <span class="text-rose-600 font-bold">*</span> son obligatorios.
       </p>
     </div>
 
+    <!-- ✅ IMPORTANTE: el submit funciona solo si el botón está dentro del form -->
     <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 grid gap-4">
-      <!-- Datos principales -->
+      <!-- General -->
       <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 class="text-sm font-bold text-gray-900">Información general</h2>
 
         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="text-sm font-semibold text-gray-800">Nombre *</label>
-            <input
-              formControlName="name"
-              class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-              placeholder="Ej. Juan Pérez"
-            />
-            <p *ngIf="form.get('name')?.touched && form.get('name')?.invalid" class="mt-1 text-xs font-semibold text-rose-600">
+            <label class="text-sm font-semibold text-gray-800">
+              Nombre <span class="text-rose-600">*</span>
+            </label>
+            <input formControlName="name" [class]="inputClass('name')" placeholder="Ej. Juan Pérez" />
+            <p *ngIf="isInvalid('name')" class="mt-1 text-xs font-semibold text-rose-600">
               El nombre es obligatorio.
             </p>
           </div>
 
           <div>
-            <label class="text-sm font-semibold text-gray-800">Cumpleaños *</label>
-            <input
-              type="date"
-              formControlName="birthday_date"
-              class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-            />
-            <p *ngIf="form.get('birthday_date')?.touched && form.get('birthday_date')?.invalid" class="mt-1 text-xs font-semibold text-rose-600">
-              La fecha de cumpleaños es obligatoria.
+            <label class="text-sm font-semibold text-gray-800">
+              Cumpleaños <span class="text-rose-600">*</span>
+            </label>
+            <input type="date" formControlName="birthday_date" [class]="inputClass('birthday_date')" />
+            <p *ngIf="isInvalid('birthday_date')" class="mt-1 text-xs font-semibold text-rose-600">
+              La fecha es obligatoria.
             </p>
           </div>
 
           <div>
             <label class="text-sm font-semibold text-gray-800">Empresa</label>
-            <input
-              formControlName="company"
-              class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-              placeholder="Ej. ACME"
-            />
+            <input formControlName="company" [class]="inputClass('company')" placeholder="Ej. ACME" />
           </div>
 
           <div>
             <label class="text-sm font-semibold text-gray-800">Sitio web</label>
-            <input
-              formControlName="website"
-              class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-              placeholder="https://ejemplo.com"
-            />
+            <input formControlName="website" [class]="inputClass('website')" placeholder="https://ejemplo.com" />
           </div>
 
           <div class="sm:col-span-2">
@@ -82,17 +89,19 @@
             <textarea
               formControlName="notes"
               rows="3"
-              class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+              [class]="inputClass('notes')"
               placeholder="Opcional..."
             ></textarea>
           </div>
         </div>
       </div>
 
-      <!-- Correos -->
+      <!-- Emails -->
       <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-gray-900">Correos *</h2>
+          <h2 class="text-sm font-bold text-gray-900">
+            Correos <span class="text-rose-600">*</span>
+          </h2>
 
           <button
             type="button"
@@ -103,32 +112,41 @@
           </button>
         </div>
 
-        <div formArrayName="emails" class="mt-4 grid gap-2">
-          <div *ngFor="let g of emails.controls; let i = index" [formGroupName]="i" class="flex gap-2">
-            <input
-              formControlName="email"
-              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
-              placeholder="correo@ejemplo.com"
-            />
+        <p class="mt-2 text-xs text-gray-600">Debe existir al menos 1 correo válido.</p>
 
-            <button
-              type="button"
-              (click)="removeEmail(i)"
-              [disabled]="emails.length === 1"
-              class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              title="Debe existir al menos 1 correo"
+        <div formArrayName="emails" class="mt-4 grid gap-2">
+          <div *ngFor="let g of emails.controls; let i = index" [formGroupName]="i" class="grid gap-1">
+            <div class="flex gap-2">
+              <input
+                formControlName="email"
+                class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-4"
+                [ngClass]="g.get('email')?.invalid && (g.get('email')?.touched || g.get('email')?.dirty)
+                  ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100'
+                  : 'border-gray-200 focus:border-indigo-400 focus:ring-indigo-100'"
+                placeholder="correo@ejemplo.com"
+              />
+
+              <button
+                type="button"
+                (click)="removeEmail(i)"
+                [disabled]="emails.length === 1"
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Quitar
+              </button>
+            </div>
+
+            <p
+              *ngIf="g.get('email')?.invalid && (g.get('email')?.touched || g.get('email')?.dirty)"
+              class="text-xs font-semibold text-rose-600"
             >
-              Quitar
-            </button>
+              Email inválido o vacío.
+            </p>
           </div>
         </div>
-
-        <p class="mt-2 text-xs text-gray-500">
-          Se enviará un email automático (modo prueba: log).
-        </p>
       </div>
 
-      <!-- Teléfonos -->
+      <!-- Phones -->
       <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-bold text-gray-900">Teléfonos</h2>
@@ -146,10 +164,9 @@
           <div *ngFor="let g of phones.controls; let i = index" [formGroupName]="i" class="flex gap-2">
             <input
               formControlName="phone"
-              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
+              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
               placeholder="9991234567"
             />
-
             <button
               type="button"
               (click)="removePhone(i)"
@@ -163,45 +180,7 @@
         </div>
       </div>
 
-      <!-- Direcciones -->
-      <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-gray-900">Direcciones</h2>
-
-          <button
-            type="button"
-            (click)="addAddress()"
-            class="rounded-xl bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-700"
-          >
-            + Agregar
-          </button>
-        </div>
-
-        <div formArrayName="addresses" class="mt-4 grid gap-3">
-          <div *ngFor="let g of addresses.controls; let i = index" [formGroupName]="i" class="rounded-2xl border border-gray-100 p-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input formControlName="street" class="rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder="Calle y número">
-              <input formControlName="city" class="rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder="Ciudad">
-              <input formControlName="state" class="rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder="Estado">
-              <input formControlName="zip" class="rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder="Código postal">
-            </div>
-
-            <div class="mt-3 flex justify-end">
-              <button
-                type="button"
-                (click)="removeAddress(i)"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Quitar dirección
-              </button>
-            </div>
-          </div>
-
-          <p *ngIf="addresses.length === 0" class="text-xs text-gray-500">Sin direcciones agregadas.</p>
-        </div>
-      </div>
-
-      <!-- Submit -->
+      <!-- Actions -->
       <div class="flex items-center justify-end gap-2">
         <button
           type="button"
@@ -211,6 +190,7 @@
           Cancelar
         </button>
 
+        <!-- ✅ ESTE botón SI DISPARA submit() -->
         <button
           type="submit"
           [disabled]="loading"

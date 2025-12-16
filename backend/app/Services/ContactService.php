@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Repositories\ContactRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\ContactCreatedMail;
 
 class ContactService
@@ -36,8 +37,16 @@ public function create(array $payload): Contact
         return $this->repo->findWithRelations($contact->id);
     });
 
-    // Enviar correo (en log)
-    Mail::to($recipient)->send(new ContactCreatedMail($contact));
+    // Enviar correo (si falla, solo se registra el error para no bloquear la creación)
+    try {
+        Mail::to($recipient)->send(new ContactCreatedMail($contact));
+    } catch (\Throwable $e) {
+        Log::error('No se pudo enviar el correo de contacto creado', [
+            'contact_id' => $contact->id ?? null,
+            'recipient' => $recipient,
+            'error' => $e->getMessage(),
+        ]);
+    }
 
     return $contact;
 }
