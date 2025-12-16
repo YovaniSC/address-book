@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Contact;
 use App\Repositories\ContactRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactCreatedMail;
 
 class ContactService
 {
@@ -19,20 +21,27 @@ class ContactService
     {
         return $this->repo->findWithRelations($id);
     }
+public function create(array $payload): Contact
+{
+    $recipient = $payload['emails'][0]['email']; // ya que emails es requerido min:1
 
-    public function create(array $payload): Contact
-    {
-        return DB::transaction(function () use ($payload) {
-            $contactData = collect($payload)->only(['name','birthday_date','notes','website','company'])->toArray();
-            $contact = $this->repo->create($contactData);
+    $contact = DB::transaction(function () use ($payload) {
+        $contactData = collect($payload)->only(['name','birthday_date','notes','website','company'])->toArray();
+        $contact = $this->repo->create($contactData);
 
-            $contact->emails()->createMany($payload['emails'] ?? []);
-            $contact->phones()->createMany($payload['phones'] ?? []);
-            $contact->addresses()->createMany($payload['addresses'] ?? []);
+        $contact->emails()->createMany($payload['emails'] ?? []);
+        $contact->phones()->createMany($payload['phones'] ?? []);
+        $contact->addresses()->createMany($payload['addresses'] ?? []);
 
-            return $this->repo->findWithRelations($contact->id);
-        });
-    }
+        return $this->repo->findWithRelations($contact->id);
+    });
+
+    // Enviar correo (en log)
+    Mail::to($recipient)->send(new ContactCreatedMail($contact));
+
+    return $contact;
+}
+
 
     public function update(int $id, array $payload): Contact
     {
