@@ -8,13 +8,14 @@ import { ContactsService } from '../../services/contacts.service';
 })
 export class ContactDetailComponent implements OnInit {
   id!: number;
-  contact: any = null;
   loading = false;
+
+  contact: any = null;
 
   constructor(
     private route: ActivatedRoute,
-    private api: ContactsService,
-    private router: Router
+    private router: Router,
+    private api: ContactsService
   ) {}
 
   ngOnInit(): void {
@@ -24,12 +25,18 @@ export class ContactDetailComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.api.get(this.id).subscribe({
-      next: (res) => {
+
+    this.api.getById(this.id).subscribe({
+      next: (res: any) => {
         this.contact = res;
         this.loading = false;
       },
-      error: () => { this.loading = false; }
+      error: (err: any) => {
+        console.error(err);
+        this.loading = false;
+        alert('❌ No se pudo cargar el contacto.');
+        this.back();
+      },
     });
   }
 
@@ -42,9 +49,17 @@ export class ContactDetailComponent implements OnInit {
   }
 
   remove(): void {
-    if (!confirm('Delete contact?')) return;
-    this.api.delete(this.id).subscribe(() => {
-      this.router.navigate(['/contacts']);
+    if (!confirm('¿Eliminar contacto?')) return;
+
+    this.api.delete(this.id).subscribe({
+      next: () => {
+        alert('✅ Contacto eliminado.');
+        this.back();
+      },
+      error: (err: any) => {
+        console.error(err);
+        alert('❌ No se pudo eliminar el contacto.');
+      },
     });
   }
 }

@@ -8,31 +8,25 @@ export class ContactsService {
 
   constructor(private http: HttpClient) {}
 
-  list(search = '', page = 1, perPage = 20): Observable<any> {
-    let params = new HttpParams()
-      .set('page', page)
-      .set('per_page', perPage);
-
-    if (search && search.trim()) {
-      params = params.set('search', search.trim());
-    }
-
-    return this.http.get(this.baseUrl, { params });
+  list(search = '', page = 1): Observable<any> {
+    let params = new HttpParams().set('page', page);
+    if (search) params = params.set('search', search);
+    return this.http.get<any>(this.baseUrl, { params });
   }
 
-  get(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${id}`);
+  getById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`);
   }
 
   create(payload: any): Observable<any> {
-    return this.http.post(this.baseUrl, payload);
+    return this.http.post<any>(this.baseUrl, payload);
   }
 
   update(id: number, payload: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${id}`, payload);
+    return this.http.put<any>(`${this.baseUrl}/${id}`, payload);
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete<any>(`${this.baseUrl}/${id}`);
   }
 }
