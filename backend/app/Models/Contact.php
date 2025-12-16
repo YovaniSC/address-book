@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Contact extends Model
 {
+    use HasFactory;
     protected $fillable = ['name', 'birthday_date', 'notes', 'website', 'company'];
 
     protected $casts = ['birthday_date' => 'date'];
