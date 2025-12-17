@@ -1,4 +1,4 @@
-# 📒 Address Book (Laravel + Angular) — Manual Completo (Principiantes)
+# 📒 Address Book (Laravel + Angular) — Manual Completo (Prueba Tecnica)
 
 Esta aplicación es una agenda de contactos con:
 - **Backend:** Laravel (API REST)
